@@ -1,0 +1,44 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "Apache-2.0"
+repository = "https://github.com/talaagent/protoc-gen-rpc-manifest"
+authors = ["Ian Macalinao <github@igm.pub>"]
+publish = false
+
+[workspace.dependencies]
+rpc-manifest = { path = "crates/rpc-manifest", default-features = false }
+anyhow = "1"
+axum = { version = "0.8", default-features = false, features = ["http1", "tokio", "json"] }
+bytes = "1"
+bpaf = { version = "0.9", features = ["derive"] }
+clap = { version = "4", default-features = false, features = ["std", "derive", "help", "usage", "error-context"] }
+http = "1"
+miette = { version = "7.6", default-features = false }
+prost = "0.14"
+prost-types = "0.14"
+reqwest = { version = "0.13", default-features = false, features = ["http2"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tempfile = "3"
+thiserror = "2"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-util", "fs"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+must_use_candidate = "allow"
+module_name_repetitions = "allow"
+unwrap_used = "deny"
+clone_on_ref_ptr = "deny"
+std_instead_of_core = "warn"
+std_instead_of_alloc = "warn"
