@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package acme.common.v1;
+
+// Imported by the other fixtures; never selected for generation itself.
+message PageRequest {
+  int32 size = 1;
+  string token = 2;
+}
+
+message Empty {}
+
+// Lives in an import, so it must not appear in the manifest.
+service HiddenService {
+  rpc Ping(Empty) returns (Empty);
+}

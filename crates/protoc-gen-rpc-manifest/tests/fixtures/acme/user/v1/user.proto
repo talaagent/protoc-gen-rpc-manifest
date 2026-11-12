@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package acme.user.v1;
+
+import "acme/common/v1/common.proto";
+
+// Manages user accounts.
+//
+// Every method needs an admin token.
+service UserService {
+  // Fetches one user by id.
+  rpc GetUser(GetUserRequest) returns (User) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Lists users, newest first.
+  rpc ListUsers(acme.common.v1.PageRequest) returns (ListUsersResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Sets a user's "display name" (quotes, \backslash and ünïcode survive).
+  rpc RenameUser(RenameUserRequest) returns (User) {
+    option idempotency_level = IDEMPOTENT;
+  }
+
+  rpc DeleteUser(GetUserRequest) returns (acme.common.v1.Empty);
+
+  // Streams changes to users as they happen.
+  rpc WatchUsers(acme.common.v1.Empty) returns (stream User);
+}
+
+// Second-tier user admin; its alias comes from the plugin options.
+service UserAdminService {
+  rpc BanUser(GetUserRequest) returns (User);
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message RenameUserRequest {
+  string id = 1;
+  string display_name = 2;
+}
+
+message User {
+  string id = 1;
+  string display_name = 2;
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+  string next_token = 2;
+}

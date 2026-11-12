@@ -1,0 +1,95 @@
+{
+  "services": [
+    {
+      "full_name": "acme.billing.v1.HTTPInvoiceService",
+      "package": "acme.billing.v1",
+      "name": "HTTPInvoiceService",
+      "alias": "http-invoice",
+      "comments": "Block comments work too.",
+      "methods": [
+        {
+          "name": "UploadLines",
+          "input_type": "acme.billing.v1.Line",
+          "output_type": "acme.common.v1.Empty",
+          "idempotency": "unknown",
+          "streaming": "client",
+          "comments": "Uploads invoice lines in chunks."
+        },
+        {
+          "name": "SyncLines",
+          "input_type": "acme.billing.v1.Line",
+          "output_type": "acme.billing.v1.Line",
+          "idempotency": "unknown",
+          "streaming": "bidi",
+          "comments": "Syncs lines both ways."
+        }
+      ]
+    },
+    {
+      "full_name": "acme.user.v1.UserAdminService",
+      "package": "acme.user.v1",
+      "name": "UserAdminService",
+      "alias": "uadmin",
+      "comments": "Second-tier user admin; its alias comes from the plugin options.",
+      "methods": [
+        {
+          "name": "BanUser",
+          "input_type": "acme.user.v1.GetUserRequest",
+          "output_type": "acme.user.v1.User",
+          "idempotency": "unknown",
+          "streaming": "unary",
+          "comments": ""
+        }
+      ]
+    },
+    {
+      "full_name": "acme.user.v1.UserService",
+      "package": "acme.user.v1",
+      "name": "UserService",
+      "alias": "user",
+      "comments": "Manages user accounts.\n\nEvery method needs an admin token.",
+      "methods": [
+        {
+          "name": "GetUser",
+          "input_type": "acme.user.v1.GetUserRequest",
+          "output_type": "acme.user.v1.User",
+          "idempotency": "no_side_effects",
+          "streaming": "unary",
+          "comments": "Fetches one user by id."
+        },
+        {
+          "name": "ListUsers",
+          "input_type": "acme.common.v1.PageRequest",
+          "output_type": "acme.user.v1.ListUsersResponse",
+          "idempotency": "no_side_effects",
+          "streaming": "unary",
+          "comments": "Lists users, newest first."
+        },
+        {
+          "name": "RenameUser",
+          "input_type": "acme.user.v1.RenameUserRequest",
+          "output_type": "acme.user.v1.User",
+          "idempotency": "idempotent",
+          "streaming": "unary",
+          "comments": "Sets a user's \"display name\" (quotes, \\backslash and ünïcode survive)."
+        },
+        {
+          "name": "DeleteUser",
+          "input_type": "acme.user.v1.GetUserRequest",
+          "output_type": "acme.common.v1.Empty",
+          "idempotency": "unknown",
+          "streaming": "unary",
+          "comments": ""
+        },
+        {
+          "name": "WatchUsers",
+          "input_type": "acme.common.v1.Empty",
+          "output_type": "acme.user.v1.User",
+          "idempotency": "unknown",
+          "streaming": "server",
+          "comments": "Streams changes to users as they happen."
+        }
+      ]
+    }
+  ]
+}
