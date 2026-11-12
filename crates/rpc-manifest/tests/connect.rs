@@ -174,3 +174,26 @@ async fn refuses_streaming_methods() {
         "`acme.echo.v1.EchoService/Watch` is a server-streaming method; only unary methods can be called"
     );
 }
+
+#[cfg(unix)]
+#[tokio::test]
+async fn over_a_unix_socket() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let path = dir.path().join("rpc.sock");
+    let listener = tokio::net::UnixListener::bind(&path).expect("bind");
+    let app = Router::new().route("/{service}/{method}", axum::routing::post(handler));
+    tokio::spawn(async move { axum::serve(listener, app).await });
+
+    let http = reqwest::Client::builder()
+        .unix_socket(path)
+        .build()
+        .expect("client");
+    // The host is ignored; the socket carries the request.
+    let c =
+        Client::with_http(http, "http://localhost").hook(connect::bearer("s3cret").expect("token"));
+    let res: Value = c
+        .call_json("acme.echo.v1.EchoService", "Echo", &json!({"via": "uds"}))
+        .await
+        .expect("call");
+    assert_eq!(res["echo"], json!({"via": "uds"}));
+}
