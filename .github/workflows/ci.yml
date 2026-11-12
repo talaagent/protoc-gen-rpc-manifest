@@ -21,6 +21,8 @@ jobs:
       - name: fmt
         run: nix develop -c cargo fmt --check
       - name: clippy
-        run: nix develop -c cargo clippy --all-targets -- -D warnings
+        run: |
+          nix develop -c cargo clippy --all-targets --all-features -- -D warnings
+          nix develop -c cargo clippy --all-targets -- -D warnings
       - name: test
-        run: nix develop -c cargo test
+        run: nix develop -c cargo test --all-features
