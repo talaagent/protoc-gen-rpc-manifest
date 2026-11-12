@@ -1,0 +1,41 @@
+[package]
+name = "rpc-manifest-cli"
+description = "A drop-in `rpc` subcommand (bpaf or clap) that lists and calls any RPC in a manifest over Connect JSON."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[features]
+default = ["bpaf"]
+# `rpc_args()` / `rpc_command()` bpaf parsers.
+bpaf = ["dep:bpaf"]
+# `RpcArgs` derives `clap::Args`.
+clap = ["dep:clap"]
+# rustls for `https://` servers.
+tls = ["rpc-manifest/tls"]
+miette = ["dep:miette", "rpc-manifest/miette"]
+
+[dependencies]
+bpaf = { workspace = true, optional = true }
+clap = { workspace = true, optional = true }
+miette = { workspace = true, optional = true }
+rpc-manifest = { workspace = true, features = ["connect"] }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+axum.workspace = true
+tempfile.workspace = true
+tokio.workspace = true
+
+[lints]
+workspace = true
+
+[[example]]
+name = "admin"
+required-features = ["bpaf"]

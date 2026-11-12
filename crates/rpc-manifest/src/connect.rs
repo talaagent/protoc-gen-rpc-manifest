@@ -243,7 +243,7 @@ pub enum CallError {
     #[cfg_attr(feature = "miette", diagnostic(code(timeout)))]
     Timeout(#[source] reqwest::Error),
     /// Connecting, sending or reading failed.
-    #[error("transport error: {0}")]
+    #[error("transport error: {}", Chain(.0))]
     #[cfg_attr(feature = "miette", diagnostic(code(transport)))]
     Transport(#[source] reqwest::Error),
     /// A [`HeaderHook`] failed.
@@ -295,6 +295,22 @@ impl CallError {
             Self::Encode(_) => "encode_request",
             Self::Decode(_) => "decode_response",
         }
+    }
+}
+
+/// An error and its sources, `: `-separated (reqwest's own `Display`
+/// leaves out the cause, e.g. "connection refused").
+struct Chain<'a>(&'a (dyn core::error::Error + 'static));
+
+impl fmt::Display for Chain<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)?;
+        let mut source = self.0.source();
+        while let Some(e) = source {
+            write!(f, ": {e}")?;
+            source = e.source();
+        }
+        Ok(())
     }
 }
 
