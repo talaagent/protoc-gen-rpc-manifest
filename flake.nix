@@ -23,6 +23,8 @@
             pkgs.clippy
             pkgs.rustfmt
             pkgs.rust-analyzer
+            pkgs.cargo-nextest
+            pkgs.cargo-deny
             pkgs.protobuf
             pkgs.buf
           ];
