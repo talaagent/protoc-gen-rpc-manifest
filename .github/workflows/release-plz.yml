@@ -1,0 +1,127 @@
+# release-plz maintains release PRs and publishes merged releases.
+# Publishing uses crates.io OIDC trusted publishing, scoped to this workflow.
+# The first publication of a crate needs a token (see CONTRIBUTING.md).
+name: release-plz
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: Publish the committed versions without requiring a new release PR
+        type: boolean
+        default: false
+      release_packages:
+        description: Optional comma-separated workspace packages for a staged initial release
+        type: string
+        default: ""
+
+permissions: {}
+
+env:
+  RUST_TOOLCHAIN: "1.98.1"
+
+jobs:
+  # The built-in GITHUB_TOKEN can maintain release PRs when repository and
+  # organization settings allow it. CI is dispatched explicitly below.
+  release-plz-pr:
+    if: github.repository_owner == 'talaagent' && !github.event.repository.private && !inputs.bootstrap
+    name: release PR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    env:
+      USE_BUILTIN_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN == '' }}
+    concurrency:
+      group: release-plz-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - name: Check release PR setup
+        env:
+          HAS_CUSTOM_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN != '' }}
+          BUILTIN_PR_ENABLED: ${{ vars.RELEASE_PR == 'true' }}
+        run: |
+          if [ "$HAS_CUSTOM_TOKEN" != true ] && [ "$BUILTIN_PR_ENABLED" != true ]; then
+            echo "::error::Enable Actions-created pull requests in organization/repository settings, then set RELEASE_PR=true. RELEASE_PLZ_TOKEN is an optional alternative. See CONTRIBUTING.md."
+            exit 1
+          fi
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # dtolnay/rust-toolchain master @ 2026-10-16; installs env.RUST_TOOLCHAIN
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - uses: release-plz/action@v0.5
+        with:
+          command: release-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN || secrets.GITHUB_TOKEN }}
+      - name: Start CI for release PRs
+        if: env.USE_BUILTIN_TOKEN == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          BASE_BRANCH: ${{ github.ref_name }}
+        run: |
+          gh pr list --base "$BASE_BRANCH" --state open \
+            --json headRefName,headRefOid,isCrossRepository \
+            --jq '.[] | select(.isCrossRepository == false) | select(.headRefName | startswith("release-plz-")) | [.headRefName, .headRefOid] | @tsv' |
+          while IFS=$'\t' read -r branch sha; do
+            runs=$(gh run list --workflow ci.yml --commit "$sha" --limit 1 --json databaseId --jq 'length')
+            if [ "$runs" = 0 ]; then
+              gh workflow run ci.yml --ref "$branch"
+            fi
+          done
+
+  # Publishes unpublished versions to crates.io in dependency order, tags
+  # v<version> and creates the GitHub release. With release_always = false
+  # it only publishes when the commit comes from a merged release PR (a
+  # `release-plz-` branch), unless dispatched with bootstrap=true.
+  release-plz-release:
+    if: github.repository_owner == 'talaagent' && !github.event.repository.private
+    name: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: read
+    concurrency:
+      group: release-plz-publish-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # dtolnay/rust-toolchain master @ 2026-10-16; installs env.RUST_TOOLCHAIN
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - name: Prepare manual release
+        if: inputs.bootstrap
+        env:
+          RELEASE_PACKAGES: ${{ inputs.release_packages }}
+        run: python3 scripts/prepare-manual-release "$RUNNER_TEMP/release-plz-manual.toml"
+      # Normal releases: OIDC trusted publishing, no registry secret.
+      - uses: release-plz/action@v0.5
+        if: ${{ !inputs.bootstrap }}
+        with:
+          command: release
+          config: release-plz.toml
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN || secrets.GITHUB_TOKEN }}
+      # Bootstrap: brand-new crates cannot use trusted publishing yet, so this
+      # path uses the short-lived CARGO_REGISTRY_TOKEN secret when it is set.
+      - uses: release-plz/action@v0.5
+        if: ${{ inputs.bootstrap }}
+        with:
+          command: release
+          config: ${{ format('{0}/release-plz-manual.toml', runner.temp) }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN || secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

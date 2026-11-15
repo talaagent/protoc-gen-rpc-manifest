@@ -1,0 +1,32 @@
+# Runs from .github/workflows/release-plz.yml while the repository is public.
+# All crates share one version, one changelog (CHANGELOG.md) and one
+# `v<version>` tag and GitHub release, owned by protoc-gen-rpc-manifest.
+[workspace]
+changelog_update = false
+git_tag_enable = false
+git_release_enable = false
+publish = true
+semver_check = true
+pr_draft = false
+# Publish only when the pushed commit is a merged release-plz PR, not on any
+# version bump.
+release_always = false
+
+[[package]]
+name = "protoc-gen-rpc-manifest"
+changelog_update = true
+changelog_path = "CHANGELOG.md"
+changelog_include = ["rpc-manifest", "rpc-manifest-cli"]
+git_tag_enable = true
+git_tag_name = "v{{ version }}"
+git_release_enable = true
+git_release_name = "v{{ version }}"
+version_group = "protoc-gen-rpc-manifest"
+
+[[package]]
+name = "rpc-manifest"
+version_group = "protoc-gen-rpc-manifest"
+
+[[package]]
+name = "rpc-manifest-cli"
+version_group = "protoc-gen-rpc-manifest"
