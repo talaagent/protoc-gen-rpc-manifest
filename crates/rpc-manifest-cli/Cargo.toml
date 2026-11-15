@@ -7,7 +7,11 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
-publish.workspace = true
+homepage.workspace = true
+readme = "README.md"
+documentation = "https://docs.rs/rpc-manifest-cli"
+keywords = ["protobuf", "connectrpc", "rpc", "cli", "bpaf"]
+categories = ["command-line-interface", "network-programming"]
 
 [features]
 default = ["bpaf"]
@@ -32,6 +36,9 @@ thiserror.workspace = true
 axum.workspace = true
 tempfile.workspace = true
 tokio.workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
 
 [lints]
 workspace = true

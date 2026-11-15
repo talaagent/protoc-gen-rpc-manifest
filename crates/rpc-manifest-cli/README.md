@@ -20,4 +20,5 @@ Features: `bpaf` (default) provides `rpc_args()` and `rpc_command()`;
 `clap` derives `clap::Args` on [`RpcArgs`]; `tls` enables `https://`;
 `miette` derives `Diagnostic` on [`Error`].
 
-See the workspace README for a complete embedding example.
+See the [workspace README](https://github.com/talaagent/protoc-gen-rpc-manifest#embedding-rpc-in-an-admin-cli)
+for a complete embedding example.

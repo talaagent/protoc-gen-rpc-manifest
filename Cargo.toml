@@ -8,11 +8,11 @@ edition = "2024"
 rust-version = "1.85"
 license = "Apache-2.0"
 repository = "https://github.com/talaagent/protoc-gen-rpc-manifest"
+homepage = "https://github.com/talaagent/protoc-gen-rpc-manifest"
 authors = ["Ian Macalinao <github@igm.pub>"]
-publish = false
 
 [workspace.dependencies]
-rpc-manifest = { path = "crates/rpc-manifest", default-features = false }
+rpc-manifest = { path = "crates/rpc-manifest", version = "0.1.0", default-features = false }
 anyhow = "1"
 axum = { version = "0.8", default-features = false, features = ["http1", "tokio", "json"] }
 bytes = "1"

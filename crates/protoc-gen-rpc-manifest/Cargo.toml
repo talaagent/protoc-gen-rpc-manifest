@@ -7,7 +7,11 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
-publish.workspace = true
+homepage.workspace = true
+readme = "README.md"
+documentation = "https://docs.rs/protoc-gen-rpc-manifest"
+keywords = ["protobuf", "protoc", "buf", "connectrpc", "codegen"]
+categories = ["development-tools::build-utils", "command-line-utilities"]
 
 [[bin]]
 name = "protoc-gen-rpc-manifest"
