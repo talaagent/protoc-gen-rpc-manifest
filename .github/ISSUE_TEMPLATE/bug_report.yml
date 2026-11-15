@@ -1,0 +1,27 @@
+name: Bug report
+description: Report a reproducible problem.
+body:
+  - type: markdown
+    attributes:
+      value: "Remove secrets (tokens, headers, request bodies) from commands and logs. Report vulnerabilities privately using SECURITY.md."
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: The smallest `.proto`, plugin options (`buf.gen.yaml` or protoc command) or Rust code, and the command you ran, that shows the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Include the full output or error (with its code) and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Version and environment
+      description: Crate names and versions, enabled features, protoc or buf version, Rust version, and OS.
+    validations:
+      required: true
