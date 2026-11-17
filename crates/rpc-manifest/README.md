@@ -9,6 +9,9 @@ generically with Connect's JSON protocol. `tls` adds rustls for `https://`.
 `serde` derives `Serialize` for the manifest types; `miette` derives
 `Diagnostic` for the errors.
 
+The crate is `#![no_std]` and needs only `alloc`, with or without `serde`;
+`connect`, `tls` and `miette` bring in `std`.
+
 ```rust
 use rpc_manifest::{Idempotency, Manifest, Method, Service, Streaming};
 

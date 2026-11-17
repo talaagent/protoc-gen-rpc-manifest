@@ -473,6 +473,7 @@ impl fmt::Display for Code {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
 
     #[test]
     fn decodes_connect_error() {
