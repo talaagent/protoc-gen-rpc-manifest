@@ -28,9 +28,9 @@ bpaf = { workspace = true, optional = true }
 clap = { workspace = true, optional = true }
 miette = { workspace = true, optional = true }
 rpc-manifest = { workspace = true, features = ["connect"] }
-serde.workspace = true
+serde = { workspace = true, features = ["std"] }
 serde_json.workspace = true
-thiserror.workspace = true
+thiserror = { workspace = true, features = ["std"] }
 
 [dev-dependencies]
 axum.workspace = true
