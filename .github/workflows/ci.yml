@@ -179,6 +179,8 @@ jobs:
       - uses: EmbarkStudios/cargo-deny-action@v2
         with:
           command: check
+      # Layering, duplicate and time budgets: see cargo-faster.toml.
+      # cargo faster check   # enable once cargo-faster >= 0.1.0 is on crates.io (needs talaagent/cargo-faster#88)
 
   package:
     name: package verification
