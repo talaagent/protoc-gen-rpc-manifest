@@ -312,7 +312,10 @@ mod tests {
             err.to_string(),
             "unknown service `usr`; did you mean `user`?"
         );
-        assert!(M.service("zzzzzzzz").unwrap_err().suggestions().is_empty());
+        assert_eq!(
+            M.service("zzzzzzzz").unwrap_err().suggestions(),
+            [] as [&str; 0]
+        );
     }
 
     #[test]

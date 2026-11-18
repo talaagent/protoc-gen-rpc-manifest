@@ -100,7 +100,7 @@ fn input_order_does_not_matter() -> Result<()> {
 fn errors_go_in_the_response() -> Result<()> {
     let set = descriptors()?;
     let res = protoc_gen_rpc_manifest::respond(&request(set, "alias=acme.user.v1.Nope:x"));
-    assert!(res.file.is_empty());
+    assert_eq!(res.file, Vec::new());
     assert_eq!(res.error(), "alias for unknown service `acme.user.v1.Nope`");
     Ok(())
 }
