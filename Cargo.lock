@@ -893,7 +893,7 @@ dependencies = [
 
 [[package]]
 name = "protoc-gen-rpc-manifest"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "prost",
@@ -1054,7 +1054,7 @@ dependencies = [
 
 [[package]]
 name = "rpc-manifest"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "axum",
  "bytes",
@@ -1070,7 +1070,7 @@ dependencies = [
 
 [[package]]
 name = "rpc-manifest-cli"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "axum",
  "bpaf",

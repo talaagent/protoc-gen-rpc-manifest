@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1](https://github.com/talaagent/protoc-gen-rpc-manifest/compare/v0.1.0...v0.1.1) - 2026-11-18
+
+### Other
+
+- Rust 1.100.0 ([#3](https://github.com/talaagent/protoc-gen-rpc-manifest/pull/3))
+- no_std + alloc (connect, tls and miette still use std) ([#1](https://github.com/talaagent/protoc-gen-rpc-manifest/pull/1))
+
 ## [0.1.0](https://github.com/talaagent/protoc-gen-rpc-manifest/releases/tag/v0.1.0) - 2026-11-15
 
 First release. All crates share one version.
