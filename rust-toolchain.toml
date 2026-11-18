@@ -1,4 +1,4 @@
-# Pinned to the rustc the flake's nixpkgs ships, so rustup users match the dev shell.
+# The flake's dev shell builds this toolchain via rust-overlay, so rustup users match it.
 [toolchain]
-channel = "1.98.1"
-components = ["rustfmt", "clippy", "rust-src"]
+channel = "1.100.0"
+components = ["rustfmt", "clippy", "rust-src", "rust-analyzer"]
