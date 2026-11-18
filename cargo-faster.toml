@@ -1,0 +1,34 @@
+#:schema https://raw.githubusercontent.com/talaagent/cargo-faster/main/docs/cargo-faster.schema.json
+# Reference: https://github.com/talaagent/cargo-faster/blob/main/docs/cargo-faster.md#the-configuration-file
+
+# The three crates, all edited often (git log, last 6 months: plugin 21
+# commits, rpc-manifest 18, rpc-manifest-cli 12).
+hot = ["protoc-gen-rpc-manifest", "rpc-manifest", "rpc-manifest-cli"]
+
+# Any library here is standalone and public.
+[[layer]]
+crates = ["*"]
+must_not_depend_on = ["tala-*"]
+reason = "a standalone public library; tala-agent depends on it, never the reverse"
+
+# rpc-manifest is the small (no_std + alloc) types crate that generated code
+# and the CLI build on; it never reaches up into the CLI or the plugin.
+[[layer]]
+crates = ["rpc-manifest"]
+must_not_depend_on = ["rpc-manifest-cli", "protoc-gen-rpc-manifest"]
+reason = "generated code depends on rpc-manifest, which stays small and below the CLI and the plugin"
+
+# Measured 2026-11-18 with `cargo faster check --timings`, twice, on a shared
+# 32-core dev box (busy, shared jobserver), cold, `nix develop`; the larger
+# of the two runs, + 25%:
+#   cold check 40.4s / 13.3s
+#   edit protoc-gen-rpc-manifest 1.6s / 3.0s, rpc-manifest 2.9s / 1.2s,
+#   rpc-manifest-cli 3.4s / 2.2s
+#   critical path: protoc-gen-rpc-manifest / rpc-manifest → rpc-manifest-cli
+#   duplicate versions: 1 (syn 2 + 3, via displaydoc from reqwest's url)
+[budgets]
+cold_check_secs = 51
+edit_rebuild_secs = { protoc-gen-rpc-manifest = 4, rpc-manifest = 4, rpc-manifest-cli = 5 }
+critical_path_max_crates = 2
+no_new_critical_crates = ["protoc-gen-rpc-manifest", "rpc-manifest", "rpc-manifest-cli"]
+max_duplicate_versions = 2
